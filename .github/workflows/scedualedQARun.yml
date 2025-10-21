@@ -18,6 +18,7 @@ jobs:
   test:
     # Use a computer running Ubuntu Linux (GitHub provides this for free!)
     runs-on: ubuntu-latest
+    timeout-minutes: 60  # Prevent the job from running forever
     
     # Give this workflow permission to write to the repository
     permissions:
@@ -47,7 +48,10 @@ jobs:
       # Step 4: Install Playwright browsers
       # Playwright needs real browsers to test your website
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install --with-deps chromium firefox webkit
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 0
+        timeout-minutes: 10
 
       # Step 5: Actually run your E2E tests!
       - name: Run Playwright tests
@@ -64,8 +68,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results-qa        # Name for this bundle of files
-          path: test-results/          # Which folder to save
+          path: |
+            test-results/
+            playwright-report/
           retention-days: 30           # Keep these files for 30 days
+          if-no-files-found: warn      # Warn if no files found
 
       # Step 7: Save the pretty HTML report (even if tests failed!)
       - name: Upload HTML report
@@ -75,6 +82,7 @@ jobs:
           name: playwright-report-qa   # Name for this bundle of files
           path: playwright-report/     # Which folder to save
           retention-days: 30           # Keep these files for 30 days
+          if-no-files-found: warn      # Warn if no report folder exists
 
       # Step 8: Put the report on a website so anyone can see it!
       # This publishes to GitHub Pages (like putting your artwork on the fridge)
