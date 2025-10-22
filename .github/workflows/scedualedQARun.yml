@@ -57,8 +57,10 @@ jobs:
       - name: Run Playwright tests
         env:
           # These are settings your tests might need
-          # Using BASE_URL from repository secrets
+          # Using secrets from repository secrets (matching .env file)
           BASE_URL: ${{ secrets.BASE_URL || 'https://automationexercise.com' }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
         run: npx playwright test  # This runs all your Playwright tests
 
       # Step 6: Save the test results (even if tests failed!)
